@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: latest
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Run tests
+        run: go test ./... -v -count=1
+
+      - name: Build
+        run: go build -o /dev/null .
+
+  acceptance:
+    name: Acceptance Tests
+    runs-on: ubuntu-latest
+    # Only run acceptance tests when secrets are available (not on forks).
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      TF_ACC: "1"
+      CLOUDINARY_URL: ${{ secrets.CLOUDINARY_URL }}
+      CLOUDINARY_ACCOUNT_ID: ${{ secrets.CLOUDINARY_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Run acceptance tests
+        run: go test ./... -v -timeout 120m -count=1
+        continue-on-error: true

@@ -1,0 +1,41 @@
+---
+page_title: "Provider: Cloudinary"
+description: |-
+  The Cloudinary provider manages Cloudinary resources as infrastructure-as-code.
+---
+
+# Cloudinary Provider
+
+The Cloudinary provider allows you to manage Cloudinary resources using Terraform or OpenTofu.
+
+## Authentication
+
+The provider supports two authentication methods.
+
+### Cloudinary URL (recommended)
+
+Set the `CLOUDINARY_URL` environment variable or the `cloudinary_url` attribute:
+
+```
+cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+```
+
+For Provisioning API resources, append `?account_id=YOUR_ACCOUNT_ID` to the URL, or use the `account_id` attribute.
+
+### Explicit credentials
+
+Set the individual `cloud_name`, `api_key`, `api_secret`, and optionally `account_id` attributes or their environment variable equivalents (`CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `CLOUDINARY_ACCOUNT_ID`).
+
+## Resources requiring `account_id`
+
+The following resources interact with the Cloudinary Provisioning API and require `account_id` to be configured:
+
+- `cloudinary_product_environment`
+- `cloudinary_product_environment_access_key`
+- `cloudinary_custom_policy`
+
+## Example Usage
+
+{{ tffile "examples/provider/provider.tf" }}
+
+{{ .SchemaMarkdown | trimspace }}
