@@ -23,8 +23,10 @@ type folderDataSource struct {
 }
 
 type folderDataSourceModel struct {
-	Path types.String `tfsdk:"path"`
-	Name types.String `tfsdk:"name"`
+	ID         types.String `tfsdk:"id"`
+	ExternalID types.String `tfsdk:"external_id"`
+	Path       types.String `tfsdk:"path"`
+	Name       types.String `tfsdk:"name"`
 }
 
 func (d *folderDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -35,6 +37,15 @@ func (d *folderDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 	resp.Schema = schema.Schema{
 		Description: "Reads information about an existing Cloudinary folder.",
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Computed:    true,
+				Description: "The folder's external ID assigned by Cloudinary (same as external_id).",
+			},
+			"external_id": schema.StringAttribute{
+				Computed: true,
+				Description: "The folder's external ID assigned by Cloudinary. " +
+					"Use this value in Cedar policy statements (e.g. resource.ancestor_ids.contains(\"...\")).",
+			},
 			"path": schema.StringAttribute{
 				Required:    true,
 				Description: "The full path of the folder to look up (e.g. \"production/images\").",
@@ -82,6 +93,8 @@ func (d *folderDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		return
 	}
 
+	data.ID = types.StringValue(found.ExternalID)
+	data.ExternalID = types.StringValue(found.ExternalID)
 	data.Path = types.StringValue(found.Path)
 	data.Name = types.StringValue(found.Name)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

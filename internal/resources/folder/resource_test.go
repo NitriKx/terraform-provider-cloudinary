@@ -34,6 +34,7 @@ func TestAccFolderResource_basic(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cloudinary_folder.test", "path", "tf-acc-test-folder"),
 					resource.TestCheckResourceAttr("cloudinary_folder.test", "name", "tf-acc-test-folder"),
+					resource.TestCheckResourceAttrSet("cloudinary_folder.test", "id"),
 				),
 			},
 			{
@@ -54,8 +55,10 @@ func TestAccFolderResource_nested(t *testing.T) {
 				Config: testAccFolderNestedConfig("tf-acc-test-parent", "tf-acc-test-child"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cloudinary_folder.parent", "path", "tf-acc-test-parent"),
+					resource.TestCheckResourceAttrSet("cloudinary_folder.parent", "id"),
 					resource.TestCheckResourceAttr("cloudinary_folder.child", "path", "tf-acc-test-parent/tf-acc-test-child"),
 					resource.TestCheckResourceAttr("cloudinary_folder.child", "name", "tf-acc-test-child"),
+					resource.TestCheckResourceAttrSet("cloudinary_folder.child", "id"),
 				),
 			},
 		},

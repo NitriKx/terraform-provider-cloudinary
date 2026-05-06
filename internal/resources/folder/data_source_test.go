@@ -17,6 +17,7 @@ func TestAccFolderDataSource_basic(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cloudinary_folder.test", "path", "tf-acc-test-ds-folder"),
 					resource.TestCheckResourceAttr("data.cloudinary_folder.test", "name", "tf-acc-test-ds-folder"),
+					resource.TestCheckResourceAttrSet("data.cloudinary_folder.test", "id"),
 				),
 			},
 		},

@@ -8,10 +8,7 @@ import (
 	cloudinary "github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/config"
 
-	"github.com/NitriKx/terraform-provider-cloudinary/internal/resources/custom_policy"
 	"github.com/NitriKx/terraform-provider-cloudinary/internal/resources/folder"
-	"github.com/NitriKx/terraform-provider-cloudinary/internal/resources/product_environment"
-	"github.com/NitriKx/terraform-provider-cloudinary/internal/resources/product_environment_access_key"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -40,7 +37,6 @@ type providerModel struct {
 	CloudName     types.String `tfsdk:"cloud_name"`
 	APIKey        types.String `tfsdk:"api_key"`
 	APISecret     types.String `tfsdk:"api_secret"`
-	AccountID     types.String `tfsdk:"account_id"`
 }
 
 func (p *CloudinaryProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -50,14 +46,12 @@ func (p *CloudinaryProvider) Metadata(_ context.Context, _ provider.MetadataRequ
 
 func (p *CloudinaryProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "The Cloudinary provider manages Cloudinary resources such as folders, " +
-			"product environments, access keys, and custom policies.",
+		Description: "The Cloudinary provider manages product-environment-level Cloudinary resources such as folders.",
 		Attributes: map[string]schema.Attribute{
 			"cloudinary_url": schema.StringAttribute{
 				Optional:  true,
 				Sensitive: true,
 				Description: "Cloudinary URL in the format cloudinary://API_KEY:API_SECRET@CLOUD_NAME. " +
-					"Can include account_id as a query parameter (e.g. ?account_id=abc123). " +
 					"Falls back to the CLOUDINARY_URL environment variable.",
 			},
 			"cloud_name": schema.StringAttribute{
@@ -76,12 +70,6 @@ func (p *CloudinaryProvider) Schema(_ context.Context, _ provider.SchemaRequest,
 				Description: "Cloudinary API secret. " +
 					"Falls back to the CLOUDINARY_API_SECRET environment variable.",
 			},
-			"account_id": schema.StringAttribute{
-				Optional: true,
-				Description: "Cloudinary account ID. Required for Provisioning API resources " +
-					"(cloudinary_product_environment, cloudinary_product_environment_access_key, cloudinary_custom_policy). " +
-					"Falls back to the CLOUDINARY_ACCOUNT_ID environment variable.",
-			},
 		},
 	}
 }
@@ -98,9 +86,7 @@ func (p *CloudinaryProvider) Configure(ctx context.Context, req provider.Configu
 	cloudName := resolveValue(data.CloudName, "CLOUDINARY_CLOUD_NAME")
 	apiKey := resolveValue(data.APIKey, "CLOUDINARY_API_KEY")
 	apiSecret := resolveValue(data.APISecret, "CLOUDINARY_API_SECRET")
-	accountID := resolveValue(data.AccountID, "CLOUDINARY_ACCOUNT_ID")
 
-	// Build the Cloudinary configuration.
 	var conf *config.Configuration
 	var err error
 
@@ -127,34 +113,25 @@ func (p *CloudinaryProvider) Configure(ctx context.Context, req provider.Configu
 		return
 	}
 
-	// Set AccountID if provided. This is required for Provisioning API resources.
-	if accountID != "" {
-		conf.Cloud.AccountID = accountID
-	}
-
-	client, err := cloudinary.NewFromConfiguration(*conf)
+	adminClient, err := cloudinary.NewFromConfiguration(*conf)
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to create Cloudinary client", err.Error())
 		return
 	}
 
-	resp.DataSourceData = client
-	resp.ResourceData = client
+	resp.DataSourceData = adminClient
+	resp.ResourceData = adminClient
 }
 
 func (p *CloudinaryProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		folder.NewResource,
-		product_environment.NewResource,
-		product_environment_access_key.NewResource,
-		custom_policy.NewResource,
 	}
 }
 
 func (p *CloudinaryProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		folder.NewDataSource,
-		product_environment.NewDataSource,
 	}
 }
 
