@@ -1,7 +1,7 @@
 # Binaries
 terraform-provider-cloudinary
 *.exe
-.task 
+.task
 
 # Go
 vendor/
