@@ -223,7 +223,11 @@ func (r *triggerResource) Read(ctx context.Context, req resource.ReadRequest, re
 		return
 	}
 	if result.Error.Message != "" {
-		// 404 — trigger was deleted outside of Terraform.
+		resp.Diagnostics.AddError("Error reading trigger", result.Error.Message)
+		return
+	}
+	if result.ID == "" {
+		// Not found — deleted outside of Terraform.
 		resp.State.RemoveResource(ctx)
 		return
 	}

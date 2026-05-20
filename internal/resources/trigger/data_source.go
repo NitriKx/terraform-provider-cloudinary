@@ -46,8 +46,8 @@ func (d *triggerDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Description: "The webhook URL. Used as a lookup key together with event_type when id is not set.",
 			},
 			"event_type": schema.StringAttribute{
-				Optional: true,
-				Computed: true,
+				Optional:    true,
+				Computed:    true,
 				Description: "The event that fires the trigger. Used as a lookup key together with uri when id is not set.",
 				Validators: []validator.String{
 					oneOfStringValidator{values: validEventTypes, fieldName: "event_type"},
@@ -156,6 +156,10 @@ func (d *triggerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			return
 		}
 		if result.Error.Message != "" {
+			resp.Diagnostics.AddError("Error reading trigger", result.Error.Message)
+			return
+		}
+		if result.ID == "" {
 			resp.Diagnostics.AddError("Trigger not found",
 				fmt.Sprintf("No trigger with id %q exists.", data.ID.ValueString()))
 			return
