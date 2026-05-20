@@ -77,6 +77,8 @@ provider "cloudinary" {
 
 Environment variable fallbacks: `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
 
+**Precedence (highest to lowest):** HCL `cloud_name`/`api_key`/`api_secret` → HCL `cloudinary_url` → env `CLOUDINARY_CLOUD_NAME`/`CLOUDINARY_API_KEY`/`CLOUDINARY_API_SECRET` → env `CLOUDINARY_URL`. HCL attributes always win over environment variables, so a provider block with explicit credentials targets the intended environment even when `CLOUDINARY_URL` is set in the shell.
+
 ---
 
 ## Resources

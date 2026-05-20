@@ -84,26 +84,60 @@ func (p *CloudinaryProvider) Configure(ctx context.Context, req provider.Configu
 		return
 	}
 
-	// Resolve each value: HCL attribute takes precedence over environment variable.
-	cloudinaryURL := resolveValue(data.CloudinaryURL, "CLOUDINARY_URL")
-	cloudName := resolveValue(data.CloudName, "CLOUDINARY_CLOUD_NAME")
-	apiKey := resolveValue(data.APIKey, "CLOUDINARY_API_KEY")
-	apiSecret := resolveValue(data.APISecret, "CLOUDINARY_API_SECRET")
+	// Read HCL-set values only — do not merge with env vars yet.
+	hclURL := attrString(data.CloudinaryURL)
+	hclCloudName := attrString(data.CloudName)
+	hclAPIKey := attrString(data.APIKey)
+	hclAPISecret := attrString(data.APISecret)
+
+	// Catch partial HCL params early to avoid silent env-var fallback masking mistakes.
+	hclParamsPartial := (hclCloudName != "") || (hclAPIKey != "") || (hclAPISecret != "")
+	hclParamsComplete := (hclCloudName != "") && (hclAPIKey != "") && (hclAPISecret != "")
+	if hclParamsPartial && !hclParamsComplete {
+		resp.Diagnostics.AddError(
+			"Incomplete provider credentials",
+			"cloud_name, api_key, and api_secret must all be set together. "+
+				"Provide all three, or use cloudinary_url instead.",
+		)
+		return
+	}
 
 	var conf *config.Configuration
 	var err error
 
+	// Precedence (standard Terraform provider convention — HCL beats env):
+	//   1. HCL params (cloud_name + api_key + api_secret)
+	//   2. HCL cloudinary_url
+	//   3. Env params (CLOUDINARY_CLOUD_NAME + CLOUDINARY_API_KEY + CLOUDINARY_API_SECRET)
+	//   4. Env CLOUDINARY_URL
+	envCloudName := os.Getenv("CLOUDINARY_CLOUD_NAME")
+	envAPIKey := os.Getenv("CLOUDINARY_API_KEY")
+	envAPISecret := os.Getenv("CLOUDINARY_API_SECRET")
+	envURL := os.Getenv("CLOUDINARY_URL")
+
 	switch {
-	case cloudinaryURL != "":
-		conf, err = config.NewFromURL(cloudinaryURL)
+	case hclParamsComplete:
+		conf, err = config.NewFromParams(hclCloudName, hclAPIKey, hclAPISecret)
+		if err != nil {
+			resp.Diagnostics.AddError("Invalid credentials", fmt.Sprintf("Failed to build Cloudinary config: %s", err))
+			return
+		}
+	case hclURL != "":
+		conf, err = config.NewFromURL(hclURL)
 		if err != nil {
 			resp.Diagnostics.AddError("Invalid cloudinary_url", fmt.Sprintf("Failed to parse cloudinary_url: %s", err))
 			return
 		}
-	case cloudName != "" && apiKey != "" && apiSecret != "":
-		conf, err = config.NewFromParams(cloudName, apiKey, apiSecret)
+	case envCloudName != "" && envAPIKey != "" && envAPISecret != "":
+		conf, err = config.NewFromParams(envCloudName, envAPIKey, envAPISecret)
 		if err != nil {
-			resp.Diagnostics.AddError("Invalid credentials", fmt.Sprintf("Failed to build Cloudinary config: %s", err))
+			resp.Diagnostics.AddError("Invalid credentials", fmt.Sprintf("Failed to build Cloudinary config from env: %s", err))
+			return
+		}
+	case envURL != "":
+		conf, err = config.NewFromURL(envURL)
+		if err != nil {
+			resp.Diagnostics.AddError("Invalid CLOUDINARY_URL", fmt.Sprintf("Failed to parse CLOUDINARY_URL: %s", err))
 			return
 		}
 	default:
@@ -147,11 +181,11 @@ func (p *CloudinaryProvider) DataSources(_ context.Context) []func() datasource.
 	}
 }
 
-// resolveValue returns the string value of a types.String attribute if set,
-// otherwise falls back to the named environment variable.
-func resolveValue(attr types.String, envVar string) string {
-	if !attr.IsNull() && !attr.IsUnknown() && attr.ValueString() != "" {
-		return attr.ValueString()
+// attrString returns the string value of a types.String HCL attribute, or ""
+// when the attribute is null or unknown (i.e. not set in the provider block).
+func attrString(attr types.String) string {
+	if attr.IsNull() || attr.IsUnknown() {
+		return ""
 	}
-	return os.Getenv(envVar)
+	return attr.ValueString()
 }
