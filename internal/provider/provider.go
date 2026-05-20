@@ -8,6 +8,8 @@ import (
 	cloudinary "github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/config"
 
+	"github.com/NitriKx/terraform-provider-cloudinary/internal/providerdata"
+	"github.com/NitriKx/terraform-provider-cloudinary/internal/resources/current_principal"
 	"github.com/NitriKx/terraform-provider-cloudinary/internal/resources/folder"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -119,8 +121,13 @@ func (p *CloudinaryProvider) Configure(ctx context.Context, req provider.Configu
 		return
 	}
 
-	resp.DataSourceData = adminClient
-	resp.ResourceData = adminClient
+	pd := &providerdata.ProviderData{
+		Client:    adminClient,
+		APIKey:    conf.Cloud.APIKey,
+		CloudName: conf.Cloud.CloudName,
+	}
+	resp.DataSourceData = pd
+	resp.ResourceData = pd
 }
 
 func (p *CloudinaryProvider) Resources(_ context.Context) []func() resource.Resource {
@@ -132,6 +139,7 @@ func (p *CloudinaryProvider) Resources(_ context.Context) []func() resource.Reso
 func (p *CloudinaryProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		folder.NewDataSource,
+		current_principal.NewDataSource,
 	}
 }
 

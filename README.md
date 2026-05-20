@@ -108,7 +108,25 @@ terraform import cloudinary_folder.assets "<external_id>"
 
 ## Data Sources
 
-### `data.cloudinary_folder`
+### `cloudinary_current_principal`
+
+Returns the identity of the currently authenticated principal (the credentials used to configure
+the provider). No API call is made — the values come from the provider configuration.
+
+```hcl
+data "cloudinary_current_principal" "me" {}
+
+output "current_principal_id" {
+  value = data.cloudinary_current_principal.me.principal_id
+}
+```
+
+**Attributes:**
+- `principal_id` - The unique identifier of the current principal (the API key).
+- `principal_type` - The type of the current principal (currently always `"apiKey"`).
+- `cloud_name` - The Cloudinary cloud name the provider is configured for.
+
+### `cloudinary_folder`
 
 Reads information about an existing folder by path. Exposes `id`, `external_id`, `name`, and `path`.
 

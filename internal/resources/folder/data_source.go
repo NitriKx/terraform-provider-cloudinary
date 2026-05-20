@@ -6,6 +6,7 @@ import (
 
 	cloudinary "github.com/cloudinary/cloudinary-go/v2"
 
+	"github.com/NitriKx/terraform-provider-cloudinary/internal/providerdata"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -62,15 +63,15 @@ func (d *folderDataSource) Configure(_ context.Context, req datasource.Configure
 	if req.ProviderData == nil {
 		return
 	}
-	client, ok := req.ProviderData.(*cloudinary.Cloudinary)
+	pd, ok := req.ProviderData.(*providerdata.ProviderData)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected provider data type",
-			fmt.Sprintf("Expected *cloudinary.Cloudinary, got: %T", req.ProviderData),
+			fmt.Sprintf("Expected *providerdata.ProviderData, got: %T", req.ProviderData),
 		)
 		return
 	}
-	d.client = client
+	d.client = pd.Client
 }
 
 func (d *folderDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {

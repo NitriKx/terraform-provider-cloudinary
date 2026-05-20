@@ -9,6 +9,8 @@ import (
 	"github.com/cloudinary/cloudinary-go/v2/api/admin"
 	"github.com/cloudinary/cloudinary-go/v2/api/admin/search"
 
+	"github.com/NitriKx/terraform-provider-cloudinary/internal/providerdata"
+
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -81,15 +83,15 @@ func (r *folderResource) Configure(_ context.Context, req resource.ConfigureRequ
 	if req.ProviderData == nil {
 		return
 	}
-	client, ok := req.ProviderData.(*cloudinary.Cloudinary)
+	pd, ok := req.ProviderData.(*providerdata.ProviderData)
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected provider data type",
-			fmt.Sprintf("Expected *cloudinary.Cloudinary, got: %T", req.ProviderData),
+			fmt.Sprintf("Expected *providerdata.ProviderData, got: %T", req.ProviderData),
 		)
 		return
 	}
-	r.client = client
+	r.client = pd.Client
 }
 
 func (r *folderResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
