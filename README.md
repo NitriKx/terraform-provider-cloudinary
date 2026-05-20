@@ -81,6 +81,40 @@ Environment variable fallbacks: `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `
 
 ## Resources
 
+### `cloudinary_trigger`
+
+Manages a Cloudinary webhook notification trigger. Triggers fire on specific asset events
+and POST a payload to the configured URL. Up to 30 triggers per product environment
+(the Cloudinary console UI shows only 10).
+
+```hcl
+resource "cloudinary_trigger" "on_upload" {
+  uri        = "https://example.com/webhooks/cloudinary"
+  event_type = "upload"
+}
+```
+
+**Arguments:**
+- `uri` (Required) — The webhook URL.
+- `event_type` (Required) — The event that fires the trigger. One of: `upload`, `delete`, `rename`, `move`, `eager`, `explode`, `multi`, `resource_tags_changed`, `resource_context_changed`, `resource_metadata_changed`, `resource_display_name_changed`, `access_control_changed`, `related_assets`, `create_folder`, `delete_folder`, `move_or_rename_asset_folder`, `proof_status_changed`, `error`, `all`.
+- `additive` (Optional, default `false`) — When `true`, fires alongside per-asset `notification_url` callbacks.
+- `filter` (Optional) — A [JSONLogic](https://jsonlogic.com/) expression (JSON-encoded string) that filters which events fire this trigger.
+- `payload_template` (Optional) — A Mustache template object (JSON-encoded string, max 16 KB) that customises the notification payload. Available namespaces: `event`, `asset`, `folder`, `eager`, `error`, `raw`.
+- `auth_scheme` (Optional, default `"default"`) — Signature method for verifying webhook payloads. One of: `default`, `legacy_hmac`, `eddsa_v2`.
+
+**Computed attributes:** `id`, `product_environment_id`, `uri_type`, `created_at`, `updated_at`.
+
+**Import** (use the trigger's `id`):
+```bash
+terraform import cloudinary_trigger.on_upload "<trigger_id>"
+```
+
+> **Note on webhook signing key:** The API key used to sign outgoing webhook payloads is
+> configured separately on a Cloudinary access key with `dedicated_for = "webhooks"`,
+> not on the trigger itself.
+
+---
+
 ### `cloudinary_folder`
 
 Manages a folder in your Cloudinary account.
@@ -125,6 +159,29 @@ output "current_principal_id" {
 - `principal_id` - The unique identifier of the current principal (the API key).
 - `principal_type` - The type of the current principal (currently always `"apiKey"`).
 - `cloud_name` - The Cloudinary cloud name the provider is configured for.
+
+### `cloudinary_trigger`
+
+Reads information about an existing trigger by `id`, or by the combination of `event_type` + `uri`.
+
+```hcl
+data "cloudinary_trigger" "existing" {
+  event_type = "upload"
+  uri        = "https://example.com/webhooks/cloudinary"
+}
+```
+
+### `cloudinary_triggers`
+
+Returns all webhook notification triggers configured for the product environment.
+
+```hcl
+data "cloudinary_triggers" "all" {}
+
+output "trigger_uris" {
+  value = [for t in data.cloudinary_triggers.all.triggers : t.uri]
+}
+```
 
 ### `cloudinary_folder`
 

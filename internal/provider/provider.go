@@ -11,6 +11,7 @@ import (
 	"github.com/NitriKx/terraform-provider-cloudinary/internal/providerdata"
 	"github.com/NitriKx/terraform-provider-cloudinary/internal/resources/current_principal"
 	"github.com/NitriKx/terraform-provider-cloudinary/internal/resources/folder"
+	"github.com/NitriKx/terraform-provider-cloudinary/internal/resources/trigger"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -133,6 +134,7 @@ func (p *CloudinaryProvider) Configure(ctx context.Context, req provider.Configu
 func (p *CloudinaryProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		folder.NewResource,
+		trigger.NewResource,
 	}
 }
 
@@ -140,6 +142,8 @@ func (p *CloudinaryProvider) DataSources(_ context.Context) []func() datasource.
 	return []func() datasource.DataSource{
 		folder.NewDataSource,
 		current_principal.NewDataSource,
+		trigger.NewDataSource,
+		trigger.NewListDataSource,
 	}
 }
 
