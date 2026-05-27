@@ -215,24 +215,30 @@ func (r *triggerResource) Read(ctx context.Context, req resource.ReadRequest, re
 		return
 	}
 
-	result, err := r.client.Admin.GetTrigger(ctx, admin.GetTriggerParams{
-		TriggerID: state.ID.ValueString(),
-	})
+	list, err := r.client.Admin.ListTriggers(ctx, admin.ListTriggersParams{})
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading trigger", err.Error())
 		return
 	}
-	if result.Error.Message != "" {
-		resp.Diagnostics.AddError("Error reading trigger", result.Error.Message)
+	if list.Error.Message != "" {
+		resp.Diagnostics.AddError("Error reading trigger", list.Error.Message)
 		return
 	}
-	if result.ID == "" {
+
+	var found *admin.Trigger
+	for i := range list.Triggers {
+		if list.Triggers[i].ID == state.ID.ValueString() {
+			found = &list.Triggers[i]
+			break
+		}
+	}
+	if found == nil {
 		// Not found — deleted outside of Terraform.
 		resp.State.RemoveResource(ctx)
 		return
 	}
 
-	newState := triggerToModel(result.Trigger, state.Filter, state.PayloadTemplate)
+	newState := triggerToModel(*found, state.Filter, state.PayloadTemplate)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &newState)...)
 }
 

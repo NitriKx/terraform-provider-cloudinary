@@ -148,23 +148,27 @@ func (d *triggerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	var found *admin.Trigger
 
 	if !data.ID.IsNull() && data.ID.ValueString() != "" {
-		result, err := d.client.Admin.GetTrigger(ctx, admin.GetTriggerParams{
-			TriggerID: data.ID.ValueString(),
-		})
+		list, err := d.client.Admin.ListTriggers(ctx, admin.ListTriggersParams{})
 		if err != nil {
 			resp.Diagnostics.AddError("Error reading trigger", err.Error())
 			return
 		}
-		if result.Error.Message != "" {
-			resp.Diagnostics.AddError("Error reading trigger", result.Error.Message)
+		if list.Error.Message != "" {
+			resp.Diagnostics.AddError("Error reading trigger", list.Error.Message)
 			return
 		}
-		if result.ID == "" {
+		wantID := data.ID.ValueString()
+		for i := range list.Triggers {
+			if list.Triggers[i].ID == wantID {
+				found = &list.Triggers[i]
+				break
+			}
+		}
+		if found == nil {
 			resp.Diagnostics.AddError("Trigger not found",
-				fmt.Sprintf("No trigger with id %q exists.", data.ID.ValueString()))
+				fmt.Sprintf("No trigger with id %q exists.", wantID))
 			return
 		}
-		found = &result.Trigger
 	} else {
 		wantEventType := data.EventType.ValueString()
 		wantURI := data.URI.ValueString()

@@ -113,23 +113,11 @@ func (r *folderResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	// CreateFolder does not return external_id. Fetch the full folder details.
-	found, err := findFolder(ctx, r.client, result.Path)
-	if err != nil {
-		resp.Diagnostics.AddError("Error reading folder after creation", err.Error())
-		return
-	}
-	if found == nil {
-		resp.Diagnostics.AddError("Folder not found after creation",
-			fmt.Sprintf("Folder %q was created but could not be found.", result.Path))
-		return
-	}
-
 	state := folderResourceModel{
-		ID:         types.StringValue(found.ExternalID),
-		ExternalID: types.StringValue(found.ExternalID),
-		Path:       types.StringValue(found.Path),
-		Name:       types.StringValue(found.Name),
+		ID:         types.StringValue(result.ExternalID),
+		ExternalID: types.StringValue(result.ExternalID),
+		Path:       types.StringValue(result.Path),
+		Name:       types.StringValue(result.Name),
 	}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
