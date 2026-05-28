@@ -3,7 +3,9 @@
   "release-type": "simple",
   "bump-minor-pre-major": true,
   "packages": {
-    ".": {}
+    ".": {
+      "last-release-sha": "9aed59abb4f5f9069985c648247bdd1d22ddad6c"
+    }
   },
   "changelog-sections": [
     { "type": "feat", "section": "Features" },
