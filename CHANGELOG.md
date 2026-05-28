@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.1 (2026-05-28)
+
+
+### Features
+
+* initial Cloudinary Terraform provider ([efa59fa](https://github.com/NitriKx/terraform-provider-cloudinary/commit/efa59fab0a28c2d00a9bae647cdca1389d27cf5d))
+
+
+### Bug Fixes
+
+* set version to 0.1.0 and restore go release type for release-please ([495c723](https://github.com/NitriKx/terraform-provider-cloudinary/commit/495c723318506c975e9c1c95b89dc06e38450005))
+
 ## 0.1.0 (2026-05-28)
 
 
