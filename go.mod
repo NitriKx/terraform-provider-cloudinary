@@ -3,7 +3,7 @@ module github.com/NitriKx/terraform-provider-cloudinary
 go 1.25.8
 
 require (
-	github.com/cloudinary/cloudinary-go/v2 v2.15.0
+	github.com/cloudinary/cloudinary-go/v2 v2.16.0
 	github.com/hashicorp/terraform-plugin-docs v0.25.0
 	github.com/hashicorp/terraform-plugin-framework v1.19.0
 	github.com/hashicorp/terraform-plugin-go v0.31.0
@@ -87,5 +87,3 @@ require (
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/cloudinary/cloudinary-go/v2 => ../cloudinary-go
