@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/NitriKx/terraform-provider-cloudinary/compare/v0.1.1...v0.2.0) (2026-06-16)
+
+
+### Features
+
+* add cloudinary_upload_preset resource ([#13](https://github.com/NitriKx/terraform-provider-cloudinary/issues/13)) ([33a5736](https://github.com/NitriKx/terraform-provider-cloudinary/commit/33a5736084d74cbca5669f56751b9071ae6eddb4))
+
 ## 0.1.1 (2026-05-28)
 
 
