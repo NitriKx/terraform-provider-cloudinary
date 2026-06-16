@@ -57,7 +57,7 @@ func (r *uploadPresetResource) Schema(_ context.Context, _ resource.SchemaReques
 			},
 			"name": schema.StringAttribute{
 				Required:    true,
-				Description: "The name of the upload preset (e.g. \"upload-service-cl-invoice\"). Changing it forces a new preset.",
+				Description: "The name of the upload preset (e.g. \"file-uploader-invoice\"). Changing it forces a new preset.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
@@ -65,7 +65,7 @@ func (r *uploadPresetResource) Schema(_ context.Context, _ resource.SchemaReques
 			"asset_folder": schema.StringAttribute{
 				Optional: true,
 				Description: "The Cloudinary asset folder assets uploaded with this preset are placed in " +
-					"(e.g. \"uaas-v2/care-preprod-eu/invoice\").",
+					"(e.g. \"uaas-v2/file-uploader-preprod-eu/invoice\").",
 			},
 			"use_asset_folder_as_public_id_prefix": schema.BoolAttribute{
 				Optional: true,

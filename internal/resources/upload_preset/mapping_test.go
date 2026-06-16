@@ -12,8 +12,8 @@ import (
 func TestUploadParamsFromModel_fullyPopulated(t *testing.T) {
 	ctx := context.Background()
 	m := uploadPresetModel{
-		Name:                           types.StringValue("upload-service-cl-invoice"),
-		AssetFolder:                    types.StringValue("uaas-v2/care-preprod-eu/invoice"),
+		Name:                           types.StringValue("file-uploader-invoice"),
+		AssetFolder:                    types.StringValue("uaas-v2/file-uploader-preprod-eu/invoice"),
 		UseAssetFolderAsPublicIDPrefix: types.BoolValue(true),
 		ResourceType:                   types.StringValue("auto"),
 		Unsigned:                       types.BoolValue(false),
@@ -31,11 +31,11 @@ func TestUploadParamsFromModel_fullyPopulated(t *testing.T) {
 		t.Fatalf("unexpected diagnostics: %v", diags)
 	}
 
-	if params.Name != "upload-service-cl-invoice" {
-		t.Errorf("Name = %q, want %q", params.Name, "upload-service-cl-invoice")
+	if params.Name != "file-uploader-invoice" {
+		t.Errorf("Name = %q, want %q", params.Name, "file-uploader-invoice")
 	}
-	if params.AssetFolder != "uaas-v2/care-preprod-eu/invoice" {
-		t.Errorf("AssetFolder = %q, want %q", params.AssetFolder, "uaas-v2/care-preprod-eu/invoice")
+	if params.AssetFolder != "uaas-v2/file-uploader-preprod-eu/invoice" {
+		t.Errorf("AssetFolder = %q, want %q", params.AssetFolder, "uaas-v2/file-uploader-preprod-eu/invoice")
 	}
 	if params.UseAssetFolderAsPublicIDPrefix == nil || !*params.UseAssetFolderAsPublicIDPrefix {
 		t.Errorf("UseAssetFolderAsPublicIDPrefix = %v, want pointer to true", params.UseAssetFolderAsPublicIDPrefix)
@@ -65,8 +65,8 @@ func TestUploadParamsFromModel_fullyPopulated(t *testing.T) {
 func TestUploadParamsFromModel_optionalNull(t *testing.T) {
 	ctx := context.Background()
 	m := uploadPresetModel{
-		Name:                           types.StringValue("upload-service-cl-reviews"),
-		AssetFolder:                    types.StringValue("uaas-v2/care-preprod-eu/reviews"),
+		Name:                           types.StringValue("file-uploader-reviews"),
+		AssetFolder:                    types.StringValue("uaas-v2/file-uploader-preprod-eu/reviews"),
 		UseAssetFolderAsPublicIDPrefix: types.BoolValue(true),
 		ResourceType:                   types.StringValue("auto"),
 		Unsigned:                       types.BoolValue(false),
@@ -96,10 +96,10 @@ func TestUploadParamsFromModel_optionalNull(t *testing.T) {
 func TestFlattenPreset_arrayAllowedFormats(t *testing.T) {
 	ctx := context.Background()
 	res := &admin.GetUploadPresetResult{
-		Name:     "upload-service-cl-invoice",
+		Name:     "file-uploader-invoice",
 		Unsigned: false,
 		Settings: map[string]interface{}{
-			"asset_folder":                         "uaas-v2/care-preprod-eu/invoice",
+			"asset_folder":                         "uaas-v2/file-uploader-preprod-eu/invoice",
 			"use_asset_folder_as_public_id_prefix": true,
 			"resource_type":                        "auto",
 			"type":                                 "authenticated",
@@ -114,10 +114,10 @@ func TestFlattenPreset_arrayAllowedFormats(t *testing.T) {
 		t.Fatalf("unexpected diagnostics: %v", diags)
 	}
 
-	if m.ID.ValueString() != "upload-service-cl-invoice" || m.Name.ValueString() != "upload-service-cl-invoice" {
+	if m.ID.ValueString() != "file-uploader-invoice" || m.Name.ValueString() != "file-uploader-invoice" {
 		t.Errorf("ID/Name = %q/%q, want preset name", m.ID.ValueString(), m.Name.ValueString())
 	}
-	if m.AssetFolder.ValueString() != "uaas-v2/care-preprod-eu/invoice" {
+	if m.AssetFolder.ValueString() != "uaas-v2/file-uploader-preprod-eu/invoice" {
 		t.Errorf("AssetFolder = %q", m.AssetFolder.ValueString())
 	}
 	if !m.UseAssetFolderAsPublicIDPrefix.ValueBool() {
@@ -147,9 +147,9 @@ func TestFlattenPreset_arrayAllowedFormats(t *testing.T) {
 func TestFlattenPreset_commaStringAllowedFormats(t *testing.T) {
 	ctx := context.Background()
 	res := &admin.GetUploadPresetResult{
-		Name: "upload-service-cl-invoice",
+		Name: "file-uploader-invoice",
 		Settings: map[string]interface{}{
-			"asset_folder":    "uaas-v2/care-preprod-eu/invoice",
+			"asset_folder":    "uaas-v2/file-uploader-preprod-eu/invoice",
 			"allowed_formats": "pdf,zip",
 		},
 	}
@@ -171,9 +171,9 @@ func TestFlattenPreset_commaStringAllowedFormats(t *testing.T) {
 func TestFlattenPreset_absentResourceTypeDefaultsToAuto(t *testing.T) {
 	ctx := context.Background()
 	res := &admin.GetUploadPresetResult{
-		Name: "upload-service-cl-invoice",
+		Name: "file-uploader-invoice",
 		Settings: map[string]interface{}{
-			"asset_folder": "uaas-v2/care-preprod-eu/invoice",
+			"asset_folder": "uaas-v2/file-uploader-preprod-eu/invoice",
 			"type":         "upload",
 		},
 	}
@@ -192,9 +192,9 @@ func TestFlattenPreset_absentResourceTypeDefaultsToAuto(t *testing.T) {
 func TestFlattenPreset_absentOptionalsAreNull(t *testing.T) {
 	ctx := context.Background()
 	res := &admin.GetUploadPresetResult{
-		Name: "upload-service-cl-reviews",
+		Name: "file-uploader-reviews",
 		Settings: map[string]interface{}{
-			"asset_folder": "uaas-v2/care-preprod-eu/reviews",
+			"asset_folder": "uaas-v2/file-uploader-preprod-eu/reviews",
 			"type":         "upload",
 		},
 	}

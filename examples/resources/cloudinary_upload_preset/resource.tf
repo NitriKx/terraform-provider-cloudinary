@@ -1,6 +1,6 @@
 resource "cloudinary_upload_preset" "invoice" {
-  name         = "upload-service-cl-invoice"
-  asset_folder = "uaas-v2/care-preprod-eu/invoice"
+  name         = "file-uploader-invoice"
+  asset_folder = "uaas-v2/file-uploader-preprod-eu/invoice"
 
   # Prefix the generated public_id with the asset folder so every minted id
   # starts with the folder path (defaults to true).

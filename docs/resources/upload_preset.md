@@ -14,8 +14,8 @@ Manages a Cloudinary upload preset (signed server-side upload configuration). Th
 
 ```terraform
 resource "cloudinary_upload_preset" "invoice" {
-  name         = "upload-service-cl-invoice"
-  asset_folder = "uaas-v2/care-preprod-eu/invoice"
+  name         = "file-uploader-invoice"
+  asset_folder = "uaas-v2/file-uploader-preprod-eu/invoice"
 
   # Prefix the generated public_id with the asset folder so every minted id
   # starts with the folder path (defaults to true).
@@ -36,12 +36,12 @@ resource "cloudinary_upload_preset" "invoice" {
 
 ### Required
 
-- `name` (String) The name of the upload preset (e.g. "upload-service-cl-invoice"). Changing it forces a new preset.
+- `name` (String) The name of the upload preset (e.g. "file-uploader-invoice"). Changing it forces a new preset.
 
 ### Optional
 
 - `allowed_formats` (List of String) The file formats Cloudinary accepts at upload time (e.g. ["pdf", "zip"]).
-- `asset_folder` (String) The Cloudinary asset folder assets uploaded with this preset are placed in (e.g. "uaas-v2/care-preprod-eu/invoice").
+- `asset_folder` (String) The Cloudinary asset folder assets uploaded with this preset are placed in (e.g. "uaas-v2/file-uploader-preprod-eu/invoice").
 - `eval` (String) A server-side JavaScript snippet run by Cloudinary at upload time (e.g. to set moderation per file based on format).
 - `moderation` (String) The moderation mode applied to uploads (e.g. "manual"). For user-origin presets this is usually set dynamically by eval rather than statically.
 - `resource_type` (String) The resource type Cloudinary applies. Defaults to "auto".
