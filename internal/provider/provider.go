@@ -12,6 +12,7 @@ import (
 	"github.com/NitriKx/terraform-provider-cloudinary/internal/resources/current_principal"
 	"github.com/NitriKx/terraform-provider-cloudinary/internal/resources/folder"
 	"github.com/NitriKx/terraform-provider-cloudinary/internal/resources/trigger"
+	"github.com/NitriKx/terraform-provider-cloudinary/internal/resources/upload_preset"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -169,6 +170,7 @@ func (p *CloudinaryProvider) Resources(_ context.Context) []func() resource.Reso
 	return []func() resource.Resource{
 		folder.NewResource,
 		trigger.NewResource,
+		upload_preset.NewResource,
 	}
 }
 
